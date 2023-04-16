@@ -23,7 +23,8 @@ describe('getZapEndpoint', () => {
 
     expect(result).toBeNull()
     expect(fetchImplementation).toHaveBeenCalledWith(
-      'https://domain/.well-known/lnurlp/name'
+      'https://domain/.well-known/lnurlp/name',
+      {headers: {}}
     )
   })
 
@@ -38,7 +39,8 @@ describe('getZapEndpoint', () => {
 
     expect(result).toBeNull()
     expect(fetchImplementation).toHaveBeenCalledWith(
-      'https://domain/.well-known/lnurlp/name'
+      'https://domain/.well-known/lnurlp/name',
+      {headers: {}}
     )
   })
 
@@ -59,7 +61,8 @@ describe('getZapEndpoint', () => {
 
     expect(result).toBe('callback')
     expect(fetchImplementation).toHaveBeenCalledWith(
-      'https://domain/.well-known/lnurlp/name'
+      'https://domain/.well-known/lnurlp/name',
+      {headers: {}}
     )
   })
 })

@@ -1,8 +1,8 @@
-/* global WebSocket */
-
-import {Event, verifySignature, validateEvent} from './event'
-import {Filter, matchFilters} from './filter'
+import {ClientRequestArgs} from 'http'
+import {ClientOptions, WebSocket} from 'ws'
+import {Event, validateEvent, verifySignature} from './event'
 import {getHex64, getSubscriptionId} from './fakejson'
+import {Filter, matchFilters} from './filter'
 
 type RelayEvent = {
   connect: () => void | Promise<void>
@@ -60,9 +60,16 @@ export function relayInit(
   options: {
     getTimeout?: number
     listTimeout?: number
+    headers?: {
+      [key: string]: string
+    }
+    logError?: boolean
+    userAgent?: string
+    wsOptions?: ClientOptions | ClientRequestArgs
   } = {}
 ): Relay {
   let {listTimeout = 3000, getTimeout = 3000} = options
+  let {headers = {}, logError = false, userAgent = '', wsOptions = {}} = options
 
   var ws: WebSocket
   var openSubs: {[id: string]: {filters: Filter[]} & SubscriptionOptions} = {}
@@ -88,7 +95,13 @@ export function relayInit(
     if (connectionPromise) return connectionPromise
     connectionPromise = new Promise((resolve, reject) => {
       try {
-        ws = new WebSocket(url)
+        ws = new WebSocket(url, {
+          ...wsOptions,
+          headers: {
+            ...headers,
+            ...(userAgent ? {'User-Agent': userAgent} : {})
+          }
+        })
       } catch (err) {
         reject(err)
       }
@@ -111,7 +124,7 @@ export function relayInit(
       let handleNextInterval: any
 
       ws.onmessage = e => {
-        incomingMessageQueue.push(e.data)
+        incomingMessageQueue.push(e.data.toString('utf8'))
         if (!handleNextInterval) {
           handleNextInterval = setInterval(handleNext, 0)
         }
@@ -163,7 +176,10 @@ export function relayInit(
               let id = data[1]
               if (id in subListeners) {
                 subListeners[id].eose.forEach(cb => cb())
-                subListeners[id].eose = [] // 'eose' only happens once per sub, so stop listeners here
+                // catch error when immediately unsubscribing
+                try {
+                  subListeners[id].eose = [] // 'eose' only happens once per sub, so stop listeners here
+                } catch {}
               }
               return
             }
@@ -185,6 +201,7 @@ export function relayInit(
               return
           }
         } catch (err) {
+          if (logError) console.error(err)
           return
         }
       }

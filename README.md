@@ -1,3 +1,11 @@
+# nostr-tools-ws
+
+- This is [nostr-tools](https://github.com/nbd-wtf/nostr-tools) but uses [ws](https://github.com/websockets/ws) instead of websocket-polyfill
+- Added `headers` and `userAgent` to `SimplePool`, `relayInit()`, `nip05`, `nip39` and `nip57`
+  - You can set `User-Agent` and other headers
+- Added `logError` and `wsOptions` to `SimplePool` and `relayInit()`
+- Only for Node.js
+
 # nostr-tools
 
 Tools for developing [Nostr](https://github.com/fiatjaf/nostr) clients.

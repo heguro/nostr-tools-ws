@@ -11,11 +11,22 @@ export function useFetchImplementation(fetchImplementation: any) {
 export async function validateGithub(
   pubkey: string,
   username: string,
-  proof: string
+  proof: string,
+  options: {
+    headers?: {[name: string]: string}
+    userAgent?: string
+  } = {}
 ): Promise<boolean> {
+  let {headers = {}, userAgent = ''} = options
+
   try {
     let res = await (
-      await _fetch(`https://gist.github.com/${username}/${proof}/raw`)
+      await _fetch(`https://gist.github.com/${username}/${proof}/raw`, {
+        headers: {
+          ...headers,
+          ...(userAgent ? {'User-Agent': userAgent} : {})
+        }
+      })
     ).text()
     return (
       res ===

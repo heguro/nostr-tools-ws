@@ -12,11 +12,22 @@ export function useFetchImplementation(fetchImplementation: any) {
 
 export async function searchDomain(
   domain: string,
-  query = ''
+  query = '',
+  options: {
+    headers?: {[name: string]: string}
+    userAgent?: string
+  } = {}
 ): Promise<{[name: string]: string}> {
+  let {headers = {}, userAgent = ''} = options
+
   try {
     let res = await (
-      await _fetch(`https://${domain}/.well-known/nostr.json?name=${query}`)
+      await _fetch(`https://${domain}/.well-known/nostr.json?name=${query}`, {
+        headers: {
+          ...headers,
+          ...(userAgent ? {'User-Agent': userAgent} : {})
+        }
+      })
     ).json()
 
     return res.names
@@ -26,8 +37,14 @@ export async function searchDomain(
 }
 
 export async function queryProfile(
-  fullname: string
+  fullname: string,
+  options: {
+    headers?: {[name: string]: string}
+    userAgent?: string
+  } = {}
 ): Promise<ProfilePointer | null> {
+  let {headers = {}, userAgent = ''} = options
+
   let [name, domain] = fullname.split('@')
 
   if (!domain) {
@@ -42,7 +59,12 @@ export async function queryProfile(
   let res
   try {
     res = await (
-      await _fetch(`https://${domain}/.well-known/nostr.json?name=${name}`)
+      await _fetch(`https://${domain}/.well-known/nostr.json?name=${name}`, {
+        headers: {
+          ...headers,
+          ...(userAgent ? {'User-Agent': userAgent} : {})
+        }
+      })
     ).json()
   } catch (err) {
     return null

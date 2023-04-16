@@ -1,8 +1,9 @@
-import {Relay, relayInit} from './relay'
-import {normalizeURL} from './utils'
-import {Filter} from './filter'
+import {ClientRequestArgs} from 'http'
+import {ClientOptions} from 'ws'
 import {Event} from './event'
-import {SubscriptionOptions, Sub, Pub} from './relay'
+import {Filter} from './filter'
+import {Pub, Relay, Sub, SubscriptionOptions, relayInit} from './relay'
+import {normalizeURL} from './utils'
 
 export class SimplePool {
   private _conn: {[url: string]: Relay}
@@ -10,11 +11,28 @@ export class SimplePool {
 
   private eoseSubTimeout: number
   private getTimeout: number
+  private headers: {[name: string]: string}
+  private logError: boolean
+  private userAgent: string
+  private wsOptions: ClientOptions | ClientRequestArgs
 
-  constructor(options: {eoseSubTimeout?: number; getTimeout?: number} = {}) {
+  constructor(
+    options: {
+      eoseSubTimeout?: number
+      getTimeout?: number
+      headers?: {[name: string]: string}
+      logError?: boolean
+      userAgent?: string
+      wsOptions?: ClientOptions | ClientRequestArgs
+    } = {}
+  ) {
     this._conn = {}
     this.eoseSubTimeout = options.eoseSubTimeout || 3400
     this.getTimeout = options.getTimeout || 3400
+    this.headers = options.headers || {}
+    this.logError = options.logError || false
+    this.userAgent = options.userAgent || ''
+    this.wsOptions = options.wsOptions || {}
   }
 
   close(relays: string[]): void {
@@ -30,7 +48,11 @@ export class SimplePool {
     if (!this._conn[nm]) {
       this._conn[nm] = relayInit(nm, {
         getTimeout: this.getTimeout * 0.9,
-        listTimeout: this.getTimeout * 0.9
+        listTimeout: this.getTimeout * 0.9,
+        headers: this.headers,
+        logError: this.logError,
+        userAgent: this.userAgent,
+        wsOptions: this.wsOptions
       })
     }
 

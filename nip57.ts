@@ -13,7 +13,15 @@ export function useFetchImplementation(fetchImplementation: any) {
   _fetch = fetchImplementation
 }
 
-export async function getZapEndpoint(metadata: Event): Promise<null | string> {
+export async function getZapEndpoint(
+  metadata: Event,
+  options: {
+    headers?: {[name: string]: string}
+    userAgent?: string
+  } = {}
+): Promise<null | string> {
+  let {headers = {}, userAgent = ''} = options
+
   try {
     let lnurl: string = ''
     let {lud06, lud16} = JSON.parse(metadata.content)
@@ -28,7 +36,12 @@ export async function getZapEndpoint(metadata: Event): Promise<null | string> {
       return null
     }
 
-    let res = await _fetch(lnurl)
+    let res = await _fetch(lnurl, {
+      headers: {
+        ...headers,
+        ...(userAgent ? {'User-Agent': userAgent} : {})
+      }
+    })
     let body = await res.json()
 
     if (body.allowsNostr && body.nostrPubkey) {
