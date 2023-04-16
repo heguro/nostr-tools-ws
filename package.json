@@ -1,6 +1,6 @@
 {
   "name": "@heguro/nostr-tools-ws",
-  "version": "1.9.0-ws.0",
+  "version": "1.9.0-ws.1",
   "description": "nostr-tools but uses ws",
   "repository": {
     "type": "git",
