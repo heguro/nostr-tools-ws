@@ -5,6 +5,17 @@
   - You can set `User-Agent` and other headers
 - Added `logError` and `wsOptions` to `SimplePool` and `relayInit()`
 - Only for Node.js
+- Install with `npm install @heguro/nostr-tools-ws` (or yarn/pnpm)
+
+## Development note
+
+Run before publishing:
+
+```sh
+rm -rf lib
+yarn build
+yarn exec -- tsc -d # generates *.d.ts
+```
 
 # nostr-tools
 

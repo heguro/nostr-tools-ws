@@ -1,9 +1,9 @@
-import {ClientRequestArgs} from 'http'
-import {ClientOptions} from 'ws'
-import {Event} from './event'
-import {Filter} from './filter'
-import {Pub, Relay, Sub, SubscriptionOptions, relayInit} from './relay'
-import {normalizeURL} from './utils'
+import { ClientRequestArgs } from 'http'
+import { ClientOptions } from 'ws'
+import { Event } from './event'
+import { Filter } from './filter'
+import { Pub, Relay, Sub, SubscriptionOptions, relayInit } from './relay'
+import { normalizeURL } from './utils'
 
 export class SimplePool {
   private _conn: {[url: string]: Relay}
@@ -75,7 +75,7 @@ export class SimplePool {
     }
 
     let subs: Sub[] = []
-    let eventListeners: Set<(event: Event) => void> = new Set()
+    let eventListeners: Set<any> = new Set()
     let eoseListeners: Set<() => void> = new Set()
     let eosesMissing = relays.length
 
